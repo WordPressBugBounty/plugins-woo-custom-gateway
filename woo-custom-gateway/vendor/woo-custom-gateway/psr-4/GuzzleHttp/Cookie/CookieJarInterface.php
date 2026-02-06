@@ -14,6 +14,7 @@ use RichardMuvirimi\WooCustomGateway\Vendor\Psr\Http\Message\ResponseInterface;
  * cookies from a file, database, etc.
  *
  * @see https://docs.python.org/2/library/cookielib.html Inspiration
+ *
  * @extends \IteratorAggregate<SetCookie>
  */
 interface CookieJarInterface extends \Countable, \IteratorAggregate

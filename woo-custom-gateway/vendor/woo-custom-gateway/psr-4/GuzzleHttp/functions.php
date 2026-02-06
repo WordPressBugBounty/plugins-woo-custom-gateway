@@ -50,7 +50,7 @@ function debug_resource($value = null)
  *
  * The returned handler is not wrapped by any default middlewares.
  *
- * @return callable(\RichardMuvirimi\WooCustomGateway\Vendor\Psr\Http\Message\RequestInterface, array): \RichardMuvirimi\WooCustomGateway\Vendor\GuzzleHttp\Promise\PromiseInterface Returns the best handler for the given system.
+ * @return callable(\RichardMuvirimi\WooCustomGateway\Vendor\Psr\Http\Message\RequestInterface, array): Promise\PromiseInterface Returns the best handler for the given system.
  *
  * @throws \RuntimeException if no viable Handler is available.
  *

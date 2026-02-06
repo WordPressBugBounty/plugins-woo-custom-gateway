@@ -52,7 +52,7 @@ class Client implements ClientInterface, \RichardMuvirimi\WooCustomGateway\Vendo
      *
      * @param array $config Client configuration settings.
      *
-     * @see \RichardMuvirimi\WooCustomGateway\Vendor\GuzzleHttp\RequestOptions for a list of available request options.
+     * @see RequestOptions for a list of available request options.
      */
     public function __construct(array $config = [])
     {

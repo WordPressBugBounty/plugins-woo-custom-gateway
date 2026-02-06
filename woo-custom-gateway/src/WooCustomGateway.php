@@ -98,6 +98,7 @@ class WooCustomGateway
         $this->define_admin_hooks();
         $this->define_site_hooks();
         $this->define_ajax_hooks();
+        $this->define_blocks_hooks();
     }
 
     /**
@@ -198,13 +199,27 @@ class WooCustomGateway
     }
 
     /**
+     * Register hooks for WooCommerce Blocks integration
+     *
+     * @return void
+     * @version 1.6.4
+     * @since 1.6.4
+     */
+    public function define_blocks_hooks(): void
+    {
+        $controller = new Admin();
+
+        $this->add_action('woocommerce_blocks_payment_method_type_registration', $controller, 'register_payment_method_blocks');
+    }
+
+    /**
      * Call the appropriate WordPress registration hooks
      *
      * Allows us to hook the functions to this class so that we have a unified api
      *
      * @param string $name
      * @param array $arguments
-     * @return mixed #type intentionally left out.
+     * @return mixed|void #type intentionally left out.
      * @throws BadMethodCallException When called function does not exist or has missing arguments.
      * @since 1.4.0
      * @version 1.4.3

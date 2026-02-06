@@ -8,8 +8,11 @@
 namespace RichardMuvirimi\WooCustomGateway\Vendor\Br33f\Ga4\MeasurementProtocol\Dto\Request;
 
 use RichardMuvirimi\WooCustomGateway\Vendor\Br33f\Ga4\MeasurementProtocol\Dto\Common\EventCollection;
+use RichardMuvirimi\WooCustomGateway\Vendor\Br33f\Ga4\MeasurementProtocol\Dto\Common\UserData;
+use RichardMuvirimi\WooCustomGateway\Vendor\Br33f\Ga4\MeasurementProtocol\Dto\Common\UserDataItem;
 use RichardMuvirimi\WooCustomGateway\Vendor\Br33f\Ga4\MeasurementProtocol\Dto\Common\UserProperties;
 use RichardMuvirimi\WooCustomGateway\Vendor\Br33f\Ga4\MeasurementProtocol\Dto\Common\UserProperty;
+use RichardMuvirimi\WooCustomGateway\Vendor\Br33f\Ga4\MeasurementProtocol\Dto\Common\ConsentProperty;
 use RichardMuvirimi\WooCustomGateway\Vendor\Br33f\Ga4\MeasurementProtocol\Dto\Event\AbstractEvent;
 use RichardMuvirimi\WooCustomGateway\Vendor\Br33f\Ga4\MeasurementProtocol\Enum\ErrorCode;
 use RichardMuvirimi\WooCustomGateway\Vendor\Br33f\Ga4\MeasurementProtocol\Exception\ValidationException;
@@ -51,12 +54,26 @@ class BaseRequest extends AbstractRequest
     protected $userProperties = null;
 
     /**
-     * If set true - indicates that events should not be use for personalized ads.
-     * Default false
-     * @var bool
+     * The user data for the measurement.
+     * Not required
+     * @var UserData
      */
-    protected $nonPersonalizedAds = false;
+    protected $userData = null;
 
+    /**
+     * If set true - indicates that events should not be use for personalized ads.
+     * Not required
+     * @var ?bool
+     */
+    protected $nonPersonalizedAds = null;
+
+    /**
+     * Sets the consent settings for the request.
+     * Replaces non_personalized_ads
+     * Not required
+     * @var ConsentProperty
+     */
+    protected $consent = null;
 
     /**
      * Collection of event items. Maximum 25 events.
@@ -121,6 +138,57 @@ class BaseRequest extends AbstractRequest
     }
 
     /**
+     * @return ConsentProperty|null
+     */
+    public function getConsent() : ?ConsentProperty
+    {
+        return $this->consent;
+    }
+
+    /**
+     * @param ConsentProperty|null $consent
+     * @return BaseRequest
+     */
+    public function setConsent(?ConsentProperty $consent) : self
+    {
+        $this->consent = $consent;
+        return $this;
+    }
+
+
+    /**
+     * @param UserData $userProperty
+     * @return BaseRequest
+     */
+    public function addUserDataItem(UserDataItem $userDataItem)
+    {
+        if ($this->getUserData() === null) {
+            $this->setUserData(new UserData());
+        }
+
+        $this->getUserData()->addUserDataItem($userDataItem);
+        return $this;
+    }
+
+    /**
+     * @return UserProperties|null
+     */
+    public function getUserData(): ?UserData
+    {
+        return $this->userData;
+    }
+
+    /**
+     * @param UserData|null $userData
+     * @return BaseRequest
+     */
+    public function setUserData(?UserData $userData)
+    {
+        $this->userData = $userData;
+        return $this;
+    }
+
+    /**
      * @param AbstractEvent $event
      * @return BaseRequest
      */
@@ -156,9 +224,12 @@ class BaseRequest extends AbstractRequest
         $exportBaseRequest = array_filter([
             'client_id' => $this->getClientId(),
             'app_instance_id' => $this->getAppInstanceId(),
-            'non_personalized_ads' => $this->isNonPersonalizedAds(),
             'events' => $this->getEvents()->export(),
         ]);
+
+        if ($this->getNonPersonalizedAds() !== null) {
+            $exportBaseRequest['non_personalized_ads'] = $this->isNonPersonalizedAds();
+        }
 
         if ($this->getUserId() !== null) {
             $exportBaseRequest['user_id'] = $this->getUserId();
@@ -170,6 +241,14 @@ class BaseRequest extends AbstractRequest
 
         if ($this->getUserProperties() !== null) {
             $exportBaseRequest['user_properties'] = $this->getUserProperties()->export();
+        }
+
+        if ($this->getUserData() !== null) {
+            $exportBaseRequest['user_data'] = $this->getUserData()->export();
+        }
+
+        if ($this->getConsent() !== null) {
+            $exportBaseRequest['consent'] = $this->getConsent()->export();
         }
 
         return $exportBaseRequest;
@@ -215,6 +294,19 @@ class BaseRequest extends AbstractRequest
      * @return bool
      */
     public function isNonPersonalizedAds(): bool
+    {
+        $nonPersonalizedAds = $this->getNonPersonalizedAds();
+        if (!isset($nonPersonalizedAds)) {
+            return false;
+        }
+
+        return $this->nonPersonalizedAds;
+    }
+
+    /**
+     * @return ?bool
+     */
+    public function getNonPersonalizedAds() : ?bool
     {
         return $this->nonPersonalizedAds;
     }
